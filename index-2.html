@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz Math Fun (QMF) – Game Matematika Visual</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF4FF;--sky:#CFE6FA;--blue:#9CCBF2;--deep:#4C8FC9;--ink:#23476B;--ok:#BDEBD3;--bad:#FFCBD3;--sun:#FFE7B8}
+*{box-sizing:border-box;margin:0}
+body{font-family:'Baloo 2','Nunito','Trebuchet MS',sans-serif;background:linear-gradient(180deg,#DCEEFF,#F4F9FF 60%);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;font-size:17px}
+button{font:inherit;color:inherit;cursor:pointer;border:0}
+:focus-visible{outline:3px solid var(--deep);outline-offset:3px}
+.bub{position:fixed;bottom:-80px;border-radius:50%;background:rgba(156,203,242,.35);animation:rise linear infinite;pointer-events:none;z-index:0}
+@keyframes rise{to{transform:translateY(-120vh) translateX(30px)}}
+.cloud{position:fixed;font-size:64px;opacity:.55;animation:drift linear infinite;pointer-events:none;z-index:0}
+@keyframes drift{from{transform:translateX(-120px)}to{transform:translateX(110vw)}}
+header{position:relative;z-index:1;text-align:center;padding:26px 16px 6px}
+.logo{font-size:64px;display:inline-block;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+h1{font-size:clamp(34px,7vw,56px);font-weight:800;color:var(--deep);line-height:1.05}
+.sub{max-width:520px;margin:6px auto 0;color:#4F7396}
+main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:14px 16px 24px;flex:1;width:100%}
+.screen{display:none}
+.screen.on{display:block;animation:pop .45s ease}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}}
+.card{background:#fff;border-radius:26px;box-shadow:0 10px 28px rgba(76,143,201,.16);padding:20px}
+h2{font-size:22px;margin:4px 0 10px}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{flex:1 1 150px;background:var(--bg);border:3px solid transparent;border-radius:18px;padding:10px 12px;text-align:left;transition:.2s}
+.chip b{display:block;font-size:19px}
+.chip small{color:#5C82A6;font-size:14px;line-height:1.2;display:block}
+.chip.on{background:var(--blue);border-color:var(--deep)}
+.chip:hover{transform:translateY(-3px)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:6px}
+.tile{background:var(--sky);border-radius:22px;padding:16px 10px;text-align:center;transition:.2s;box-shadow:0 5px 0 var(--blue)}
+.tile:hover{transform:translateY(-5px) rotate(-1deg);background:#D9ECFC}
+.tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--blue)}
+.tile i{font-style:normal;font-size:38px;display:block;font-weight:800;color:var(--deep)}
+.tile b{display:block;font-size:19px}
+.tile small{color:#4F7396;font-size:14px;line-height:1.2;display:block}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.back{background:#fff;border-radius:50px;padding:6px 16px;box-shadow:0 3px 10px rgba(76,143,201,.2)}
+.tag{background:var(--sun);border-radius:50px;padding:4px 14px;font-weight:700}
+.score{margin-left:auto;background:var(--deep);color:#fff;border-radius:50px;padding:4px 16px;font-weight:800}
+.progress{height:14px;background:var(--sky);border-radius:20px;overflow:hidden;margin-bottom:6px}
+.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--deep));border-radius:20px;transition:width .6s ease}
+.qno{font-size:14px;color:#5C82A6;margin-bottom:8px}
+#vis{min-height:90px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;background:var(--bg);border-radius:20px;padding:12px;margin-bottom:14px;overflow:hidden}
+#vis:empty{display:none}
+.em{font-size:24px;letter-spacing:1px;line-height:1.2;animation:pop .6s}
+.arr{display:grid;gap:3px;animation:pop .6s}
+.arr i{width:15px;height:15px;border-radius:4px;background:var(--blue)}
+.bar{width:100%;max-width:420px;height:34px;background:#fff;border-radius:20px;overflow:hidden;border:3px solid var(--blue)}
+.bar b{display:block;height:100%;background:var(--deep);color:#fff;text-align:right;padding-right:10px;animation:grow 1.2s ease}
+@keyframes grow{from{width:0}}
+.mystery{font-size:34px;font-weight:800;color:var(--deep);background:#fff;border:4px dashed var(--blue);border-radius:20px;padding:6px 26px;animation:float 2s ease-in-out infinite}
+.svg{width:100%;max-width:360px;height:auto;animation:pop .6s}
+.svg text{font:700 13px 'Baloo 2',sans-serif;fill:#23476B}
+.svg .sh{fill:#CFE6FA;stroke:#4C8FC9;stroke-width:3;stroke-linejoin:round}
+.svg .dash{stroke:#4C8FC9;stroke-width:2;stroke-dasharray:5 4;fill:none}
+#q{font-size:clamp(24px,5vw,34px);font-weight:800;text-align:center;margin:6px 0 16px}
+#q.small{font-size:20px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{background:var(--sky);border-radius:18px;padding:14px 10px;font-size:22px;font-weight:700;box-shadow:0 4px 0 var(--blue);transition:.15s}
+.opt.long{font-size:17px;text-align:left}
+.opt:hover:not(:disabled){transform:translateY(-3px);background:#D9ECFC}
+.opt.ok{background:var(--ok);box-shadow:0 4px 0 #8FD3B1;animation:jump .5s}
+.opt.bad{background:var(--bad);box-shadow:0 4px 0 #F2A3AF;animation:shake .4s}
+@keyframes jump{40%{transform:scale(1.08)}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+#fb{text-align:center;font-weight:800;font-size:20px;min-height:30px;margin-top:14px}
+.next{display:none;margin:8px auto 0;background:var(--deep);color:#fff;border-radius:50px;padding:10px 30px;font-weight:800;font-size:19px;animation:pop .3s}
+.res{text-align:center}
+.stars{font-size:54px;letter-spacing:6px}
+.stars span{display:inline-block;animation:jump .7s both}
+.big{font-size:56px;font-weight:800;color:var(--deep)}
+.btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.btn{background:var(--deep);color:#fff;border-radius:50px;padding:10px 26px;font-weight:800}
+.btn.alt{background:var(--sky);color:var(--ink)}
+.fall{position:fixed;top:-40px;font-size:28px;animation:fall 2.8s linear forwards;pointer-events:none;z-index:5}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+.nm{width:100%;font:inherit;font-size:20px;font-weight:700;padding:10px 20px;border-radius:50px;border:3px solid var(--blue);background:var(--bg);color:var(--ink)}
+.nm.err{animation:shake .4s;border-color:#F2A3AF}
+#nhint{display:block;min-height:20px;color:#C0566A;font-size:14px;margin:4px 0 0 14px}
+.row{display:flex;gap:10px;align-items:center;padding:8px 14px;border-radius:16px;background:var(--bg);margin-bottom:8px;animation:pop .4s}
+.row b{flex:1}
+.row em{font-style:normal;color:#5C82A6;font-size:14px}
+.row strong{color:var(--deep)}
+.clr{background:none;color:#5C82A6;text-decoration:underline;font-size:14px;margin-top:4px}
+footer{position:relative;z-index:1;text-align:center;padding:18px 12px;background:rgba(207,230,250,.7);color:#3C648A;font-size:15px}
+footer strong{color:var(--deep)}
+@media(max-width:480px){.opts{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">☁️</div>
+  <h1>Quiz Math Fun <span style="font-size:.55em;white-space:nowrap">(QMF)</span></h1>
+  <p class="sub">Game matematika visual yang menyenangkan. Pilih tingkat kesulitan, lalu pilih petualanganmu!</p>
+</header>
+
+<main>
+  <section id="home" class="screen on">
+    <div class="card">
+      <h2>1. Tulis nama pemain</h2>
+      <input id="pname" class="nm" type="text" maxlength="20" placeholder="Ketik namamu di sini…" autocomplete="off" aria-label="Nama pemain" oninput="this.classList.remove('err');$('nhint').textContent=''">
+      <small id="nhint"></small>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>2. Pilih tingkat kesulitan</h2>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>3. Pilih permainan</h2>
+      <div class="grid" id="tiles"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>🏆 Papan Skor</h2>
+      <div id="board"></div>
+    </div>
+  </section>
+
+  <section id="play" class="screen">
+    <div class="top">
+      <button class="back" onclick="goHome()">← Menu</button>
+      <span class="tag" id="tag"></span>
+      <span class="score" id="score">0 poin</span>
+    </div>
+    <div class="card">
+      <div class="progress"><div id="prog"></div></div>
+      <div class="qno" id="qno"></div>
+      <div id="vis"></div>
+      <div id="q"></div>
+      <div class="opts" id="opts"></div>
+      <div id="fb" aria-live="polite"></div>
+      <button class="next" id="nextBtn" onclick="next()">Lanjut</button>
+    </div>
+  </section>
+
+  <section id="end" class="screen">
+    <div class="card res" id="endBox"></div>
+  </section>
+</main>
+
+<footer>
+  <p><strong>Pencipta:</strong> Taqi, Suryana, Ira</p>
+  <p>Copyright © 2026 Taqi, Suryana, Ira. Original Project.</p>
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[R(0,a.length-1)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+
+const DIFF=[
+  {n:'Mudah',s:'⭐',t:'Angka kecil, cocok untuk pemula'},
+  {n:'Sedang',s:'⭐⭐',t:'Angka lebih besar, mulai menantang'},
+  {n:'Sulit',s:'⭐⭐⭐',t:'Langkah berlapis untuk jagoan'}
+];
+const CATS={
+  aritmatika:['➕','Aritmatika','Tambah, kurang, kali'],
+  aljabar:['x','Aljabar','Cari nilai x'],
+  persen:['%','Persen','Bagian dari seratus'],
+  pangkat:['²','Pangkat','Kuadrat dan kubik'],
+  campuran:['🎲','Campuran','Semua materi diacak'],
+  bangunan:['🏠','Luas Bangunan','Hitung luas bangun datar'],
+  kepribadian:['🌈','Kepribadian Anak','Kenali gayamu']
+};
+const S={d:0,cat:'',i:0,score:0,streak:0,ok:0,N:10,locked:false,cur:null,pt:{A:0,B:0,C:0,D:0}};
+
+/* ---------- Menu ---------- */
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function loadBoard(){try{return JSON.parse(localStorage.getItem('awanHitungSkor')||'[]')}catch(e){return[]}}
+function saveScore(){
+  const b=loadBoard();b.push({n:S.name,s:S.score,c:CATS[S.cat][1],d:DIFF[S.d].n});
+  b.sort((x,y)=>y.s-x.s);
+  try{localStorage.setItem('awanHitungSkor',JSON.stringify(b.slice(0,50)))}catch(e){}
+}
+function clearBoard(){try{localStorage.removeItem('awanHitungSkor')}catch(e){}renderBoard()}
+function renderBoard(){
+  const b=loadBoard().slice(0,8),el=$('board');
+  el.innerHTML=b.length
+    ?b.map((r,i)=>`<div class="row"><span>${['🥇','🥈','🥉'][i]||(i+1)+'.'}</span><b>${esc(r.n)}</b><em>${esc(r.c)} • ${esc(r.d)}</em><strong>${r.s}</strong></div>`).join('')+'<button class="clr" onclick="clearBoard()">Hapus semua skor</button>'
+    :'<p style="color:#5C82A6">Belum ada skor. Jadilah pemain pertama!</p>';
+}
+function buildHome(){
+  renderBoard();
+  $('chips').innerHTML=DIFF.map((x,i)=>`<button class="chip${i===S.d?' on':''}" onclick="setD(${i})"><b>${x.s} ${x.n}</b><small>${x.t}</small></button>`).join('');
+  $('tiles').innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="tile" onclick="start('${k}')"><i>${v[0]}</i><b>${v[1]}</b><small>${v[2]}</small></button>`).join('');
+}
+function setD(i){S.d=i;buildHome()}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));scrollTo(0,0)}
+function goHome(){buildHome();show('home')}
+
+/* ---------- Soal matematika ---------- */
+const grid=(r,c)=>`<div class="arr" style="grid-template-columns:repeat(${c},15px)">${'<i></i>'.repeat(r*c)}</div>`;
+function genMath(cat,d){
+  if(cat==='campuran')cat=pick(['aritmatika','aljabar','persen','pangkat']);
+  let q,ans,vis='';
+  if(cat==='aritmatika'){
+    if(d===0){
+      if(R(0,1)){const a=R(2,12),b=R(2,9);q=`${a} + ${b} = ?`;ans=a+b;vis=`<span class="em">${'🍎'.repeat(a)}</span><b>+</b><span class="em">${'🍎'.repeat(b)}</span>`}
+      else{const a=R(8,20),b=R(2,a-2);q=`${a} − ${b} = ?`;ans=a-b;vis=`<span class="em">${'🍎'.repeat(a)}</span>`}
+    }else if(d===1){
+      if(R(0,1)){const a=R(3,12),b=R(3,12);q=`${a} × ${b} = ?`;ans=a*b;vis=grid(a,b)}
+      else{const a=R(25,80),b=R(12,60);q=`${a} + ${b} = ?`;ans=a+b}
+    }else{
+      const a=R(5,20),b=R(5,20),c=R(2,9),e=R(1,19);q=`(${a} + ${b}) × ${c} − ${e} = ?`;ans=(a+b)*c-e;
+    }
+  }else if(cat==='aljabar'){
+    vis='<div class="mystery">x = ?</div>';
+    if(d===0){const a=R(2,9),x=R(1,12);q=`x + ${a} = ${a+x}`;ans=x}
+    else if(d===1){const a=R(2,9),x=R(2,12);q=`${a}x = ${a*x}`;ans=x}
+    else{const a=R(2,9),x=R(2,12),b=R(1,15);q=`${a}x + ${b} = ${a*x+b}`;ans=x}
+    q+='<br><small>Berapa nilai x?</small>';
+  }else if(cat==='persen'){
+    const p=d===0?pick([50,10]):d===1?pick([10,20,25,50,75]):pick([5,15,35,45,60,85]);
+    const n=d===0?pick([20,40,60,80,100,200]):d===1?pick([40,80,120,200,400]):pick([20,40,60,80,100,200]);
+    q=`${p}% dari ${n} = ?`;ans=p*n/100;
+    vis=`<div class="bar"><b style="width:${p}%">${p}%</b></div>`;
+  }else{
+    if(d===0){const a=R(2,10);q=`${a}<sup>2</sup> = ?`;ans=a*a;vis=grid(a,a)}
+    else if(d===1){if(R(0,1)){const b=R(2,5);q=`${b}<sup>3</sup> = ?`;ans=b**3}else{const n=R(3,8);q=`2<sup>${n}</sup> = ?`;ans=2**n}}
+    else{const a=R(5,12),b=R(2,4);q=`${a}<sup>2</sup> + ${b}<sup>3</sup> = ?`;ans=a*a+b**3}
+  }
+  return{q,ans,vis};
+}
+
+/* ---------- Luas bangunan ---------- */
+const lb=(x,y,t,a='middle')=>`<text x="${x}" y="${y}" text-anchor="${a}">${t}</text>`;
+function genArea(d){
+  const kind=pick(d===0?['sq','rect']:d===1?['rect','tri','para']:['tri','trap','L']);
+  const nm=pick(['rumah','kolam','taman','kamar','lapangan','atap']);
+  let ans,s='',desc='';
+  if(kind==='sq'||kind==='rect'){
+    const p=kind==='sq'?R(2,9):R(4,12),l=kind==='sq'?p:R(2,p-1);ans=p*l;
+    const sc=Math.min(190/p,110/l),W=p*sc,H=l*sc,x=(260-W)/2,y=(140-H)/2+12;
+    s=`<rect class="sh" x="${x}" y="${y}" width="${W}" height="${H}"/>${lb(x+W/2,y+H+18,p+' m')}${lb(x+W+8,y+H/2+4,l+' m','start')}`;
+    desc=kind==='sq'?'berbentuk persegi':'berbentuk persegi panjang';
+  }else if(kind==='tri'){
+    const a=2*R(2,8),t=R(3,10);ans=a*t/2;
+    const sc=Math.min(190/a,110/t),W=a*sc,H=t*sc,x=(260-W)/2,y=(140-H)/2+12,xa=x+W*.35;
+    s=`<polygon class="sh" points="${x},${y+H} ${x+W},${y+H} ${xa},${y}"/><line class="dash" x1="${xa}" y1="${y}" x2="${xa}" y2="${y+H}"/>${lb(x+W/2,y+H+18,a+' m')}${lb(xa+6,y+H/2+4,t+' m','start')}`;
+    desc='berbentuk segitiga';
+  }else if(kind==='para'){
+    const a=R(3,10),t=R(2,8);ans=a*t;
+    const sc=Math.min(160/a,110/t),W=a*sc,H=t*sc,o=40,x=(260-W-o)/2,y=(140-H)/2+12;
+    s=`<polygon class="sh" points="${x+o},${y} ${x+o+W},${y} ${x+W},${y+H} ${x},${y+H}"/><line class="dash" x1="${x+o}" y1="${y}" x2="${x+o}" y2="${y+H}"/>${lb(x+W/2,y+H+18,a+' m')}${lb(x+o+6,y+H/2+4,t+' m','start')}`;
+    desc='berbentuk jajar genjang';
+  }else if(kind==='trap'){
+    const a=R(3,8),b=a+2*R(1,3),t=2*R(2,5);ans=(a+b)*t/2;
+    const sc=Math.min(190/b,100/t),B=b*sc,A=a*sc,H=t*sc,x=(260-B)/2,y=(140-H)/2+16,m=x+B/2;
+    s=`<polygon class="sh" points="${x+(B-A)/2},${y} ${x+(B-A)/2+A},${y} ${x+B},${y+H} ${x},${y+H}"/><line class="dash" x1="${m}" y1="${y}" x2="${m}" y2="${y+H}"/>${lb(m,y-6,a+' m')}${lb(m,y+H+18,b+' m')}${lb(m+6,y+H/2+4,t+' m','start')}`;
+    desc='berbentuk trapesium';
+  }else{
+    const W=R(8,12),H=R(6,10),w=R(2,4),h=R(2,4);ans=W*H-w*h;
+    const sc=Math.min(180/W,100/H),x=(260-W*sc)/2,y=(140-H*sc)/2+14,X=W*sc,Y=H*sc,cx=x+(W-w)*sc;
+    s=`<polygon class="sh" points="${x},${y} ${cx},${y} ${cx},${y+h*sc} ${x+X},${y+h*sc} ${x+X},${y+Y} ${x},${y+Y}"/>${lb(x+X/2,y+Y+18,W+' m')}${lb(x-8,y+Y/2+4,H+' m','end')}${lb(cx+w*sc/2,y+h*sc-6,w+' m')}${lb(cx+6,y+h*sc/2+4,h+' m','start')}`;
+    desc='berbentuk L (persegi panjang yang dipotong di satu sudut)';
+  }
+  return{q:`Luas ${nm} ${desc} ini berapa m²?`,ans,vis:`<svg class="svg" viewBox="0 0 260 170">${s}</svg>`,small:true};
+}
+
+/* ---------- Kepribadian ---------- */
+const PQ=[
+ {q:'Saat libur, kamu paling suka…',o:[['Menjelajah tempat baru','A'],['Menyusun puzzle atau teka-teki','B'],['Membantu teman atau keluarga','C'],['Menggambar atau bermusik','D']]},
+ {q:'Ketemu soal yang sulit, kamu…',o:[['Langsung mencoba tantangannya','A'],['Memikirkan langkahnya pelan-pelan','B'],['Belajar bareng teman','C'],['Menggambar soalnya supaya jelas','D']]},
+ {q:'Hadiah yang paling kamu mau?',o:[['Sepeda atau alat petualangan','A'],['Robot atau buku sains','B'],['Hadiah untuk dibagi ke teman','C'],['Set warna atau alat musik','D']]},
+ {q:'Di kerja kelompok, kamu biasanya…',o:[['Jadi pemimpin yang berani','A'],['Membuat rencana','B'],['Menenangkan suasana','C'],['Memberi ide kreatif','D']]},
+ {q:'Pelajaran yang paling seru?',o:[['Olahraga dan alam','A'],['Matematika dan logika','B'],['Bahasa dan diskusi','C'],['Seni dan prakarya','D']]},
+ {q:'Kalau membuat game, kamu ingin…',o:[['Penuh misi seru','A'],['Teka-teki cerdas','B'],['Main bersama-sama','C'],['Gambar warna-warni','D']]}
+];
+const PT={
+ A:['🧭','Penjelajah Berani','Kamu suka tantangan dan berani mencoba. Belajar matematika lewat permainan dan misi akan terasa seru.','Coba tingkat Sedang atau Sulit, lalu kejar skor tertinggi!'],
+ B:['🧩','Pemikir Cerdik','Kamu suka berpikir runtut dan memecahkan teka-teki. Pola dan logika adalah kekuatanmu.','Cobalah aljabar dan pangkat untuk melatih logikamu.'],
+ C:['🤝','Penolong Hangat','Kamu peduli pada orang lain dan nyaman belajar bersama. Menjelaskan soal ke teman akan membuatmu makin paham.','Ajak temanmu main bergantian dan saling cek jawaban.'],
+ D:['🎨','Seniman Kreatif','Kamu paham lewat gambar dan warna. Visual membantumu melihat bentuk dari sebuah angka.','Kamu pasti suka kuis Luas Bangunan dan visual pangkat.']
+};
+
+/* ---------- Alur permainan ---------- */
+function start(cat){
+  const nm=$('pname').value.trim();
+  if(!nm){
+    $('nhint').textContent='Tulis namamu dulu ya!';
+    const inp=$('pname');inp.classList.remove('err');void inp.offsetWidth;inp.classList.add('err');
+    inp.focus();scrollTo(0,0);return;
+  }
+  Object.assign(S,{cat,name:nm,i:0,score:0,streak:0,ok:0,pt:{A:0,B:0,C:0,D:0}});
+  const perso=cat==='kepribadian';
+  S.N=perso?PQ.length:10;
+  $('tag').textContent=nm+' • '+CATS[cat][1]+(perso?'':' • '+DIFF[S.d].s+' '+DIFF[S.d].n);
+  $('score').style.display=perso?'none':'';
+  $('score').textContent='0 poin';
+  show('play');next();
+}
+function makeOpts(ans){
+  const s=new Set([ans]);let g=0;
+  while(s.size<4&&g++<80){const r=Math.abs(ans)>30?R(-12,12):R(-6,6);if(!r)continue;const v=ans+r;if(ans>=0&&v<0)continue;s.add(v)}
+  return shuffle([...s]);
+}
+function next(){
+  if(S.i>=S.N)return finish();
+  S.locked=false;$('fb').textContent='';$('nextBtn').style.display='none';
+  $('prog').style.width=(S.i/S.N*100)+'%';
+  $('qno').textContent=`Pertanyaan ${S.i+1} dari ${S.N}`;
+  const box=$('opts');
+  if(S.cat==='kepribadian'){
+    const p=PQ[S.i];$('vis').innerHTML='';$('q').className='small';$('q').textContent=p.q;
+    box.innerHTML=shuffle([...p.o]).map(o=>`<button class="opt long" data-t="${o[1]}">${o[0]}</button>`).join('');
+    box.querySelectorAll('button').forEach(b=>b.onclick=()=>perso(b));
+  }else{
+    const q=S.cur=S.cat==='bangunan'?genArea(S.d):genMath(S.cat,S.d);
+    $('vis').innerHTML=q.vis||'';$('q').className=q.small?'small':'';$('q').innerHTML=q.q;
+    box.innerHTML=makeOpts(q.ans).map(v=>`<button class="opt" data-v="${v}">${v}</button>`).join('');
+    box.querySelectorAll('button').forEach(b=>b.onclick=()=>answer(b));
+  }
+}
+function answer(btn){
+  if(S.locked)return;S.locked=true;
+  const ok=+btn.dataset.v===S.cur.ans;
+  document.querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(+b.dataset.v===S.cur.ans)b.classList.add('ok')});
+  if(ok){S.score+=10+Math.min(S.streak,5)*2;S.streak++;S.ok++;$('fb').textContent=S.streak>1?`Hebat! Beruntun ${S.streak}x 🔥`:'Benar! 🎉'}
+  else{btn.classList.add('bad');S.streak=0;$('fb').textContent=`Belum tepat. Jawabannya ${S.cur.ans}`}
+  $('score').textContent=S.score+' poin';
+  S.i++;$('prog').style.width=(S.i/S.N*100)+'%';
+  $('nextBtn').textContent=S.i>=S.N?'Lihat hasil':'Lanjut';$('nextBtn').style.display='block';
+}
+function perso(btn){
+  if(S.locked)return;S.locked=true;btn.classList.add('ok');S.pt[btn.dataset.t]++;S.i++;
+  $('prog').style.width=(S.i/S.N*100)+'%';
+  setTimeout(next,450);
+}
+function confetti(){
+  for(let i=0;i<20;i++){const e=document.createElement('span');e.className='fall';e.textContent=pick(['🎈','✨','⭐','💙']);
+    e.style.left=R(0,95)+'vw';e.style.animationDelay=(Math.random()*1.2)+'s';document.body.appendChild(e);setTimeout(()=>e.remove(),4500)}
+}
+function finish(){
+  const box=$('endBox');
+  if(S.cat==='kepribadian'){
+    const k=Object.keys(S.pt).sort((a,b)=>S.pt[b]-S.pt[a])[0],t=PT[k];
+    box.innerHTML=`<div class="big">${t[0]}</div><h2>${esc(S.name)}, kamu adalah ${t[1]}!</h2><p style="max-width:480px;margin:8px auto">${t[2]}</p><p><b>Saran:</b> ${t[3]}</p><div class="btns"><button class="btn" onclick="start('kepribadian')">Ulangi tes</button><button class="btn alt" onclick="goHome()">Ke menu</button></div>`;
+  }else{
+    const st=S.ok>=9?3:S.ok>=6?2:S.ok>=3?1:0;
+    saveScore();
+    const msg=['Ayo coba lagi, kamu pasti bisa!','Bagus, terus berlatih!','Keren sekali!','Luar biasa, jagoan matematika!'][st];
+    box.innerHTML=`<div class="stars">${[0,1,2].map(i=>`<span style="animation-delay:${i*.25}s;${i<st?'':'filter:grayscale(1);opacity:.35'}">⭐</span>`).join('')}</div><h2>${esc(S.name)}</h2><div class="big">${S.score} poin</div><p>${S.ok} dari ${S.N} jawaban benar • ${CATS[S.cat][1]} • ${DIFF[S.d].n}</p><h2>${msg}</h2><div class="btns"><button class="btn" onclick="start('${S.cat}')">Main lagi</button><button class="btn alt" onclick="goHome()">Ke menu</button></div>`;
+    if(st>=2)confetti();
+  }
+  show('end');
+}
+
+/* ---------- Latar bergerak ---------- */
+(function(){
+  for(let i=0;i<10;i++){const b=document.createElement('div');b.className='bub';const z=R(20,70);
+    b.style.cssText=`width:${z}px;height:${z}px;left:${R(0,95)}%;animation-duration:${R(14,26)}s;animation-delay:${-R(0,20)}s`;document.body.appendChild(b)}
+  [['12vh',46],['40vh',60],['70vh',38]].forEach(([top,d],i)=>{const c=document.createElement('div');c.className='cloud';c.textContent='☁️';
+    c.style.cssText=`top:${top};animation-duration:${d}s;animation-delay:${-i*14}s`;document.body.appendChild(c)});
+})();
+buildHome();
+</script>
+</body>
+</html>
